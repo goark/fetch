@@ -8,26 +8,42 @@ import (
 	"github.com/spiegel-im-spiegel/errs"
 )
 
-//Response is wrapper class of http.Response.
-type Response struct {
+//response is wrapper class of http.Response.
+type response struct {
 	*http.Response
 }
 
+//Header method returns Header element in http.Response.
+func (resp *response) Header() http.Header {
+	if resp == nil || resp.Response == nil {
+		return nil
+	}
+	return resp.Response.Header
+}
+
+//Header method returns Body element in http.Response.
+func (resp *response) Body() io.ReadCloser {
+	if resp == nil || resp.Response == nil {
+		return nil
+	}
+	return resp.Response.Body
+}
+
 //Close method closes Response.Body safety.
-func (resp *Response) Close() {
+func (resp *response) Close() {
 	if resp == nil || resp.Response == nil {
 		return
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
-	resp.Body.Close()
+	_, _ = io.Copy(ioutil.Discard, resp.Body())
+	resp.Body().Close()
 }
 
-func (resp *Response) DumpBodyAndClose() ([]byte, error) {
+func (resp *response) DumpBodyAndClose() ([]byte, error) {
 	if resp == nil || resp.Response == nil {
 		return nil, errs.Wrap(ErrNullPointer)
 	}
-	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body().Close()
+	b, err := ioutil.ReadAll(resp.Body())
 	return b, errs.Wrap(err)
 }
 
