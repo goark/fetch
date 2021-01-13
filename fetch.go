@@ -41,7 +41,7 @@ func WithHTTPClient(cli *http.Client) ClientOpts {
 }
 
 // Get method returns respons data from URL by GET method.
-func (c *client) Get(u *url.URL, opts ...HeaderOpts) (*http.Response, error) {
+func (c *client) Get(u *url.URL, opts ...HeaderOpts) (*Response, error) {
 	req, err := c.request(http.MethodGet, u, nil, opts...)
 	if err != nil {
 		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
@@ -54,7 +54,7 @@ func (c *client) Get(u *url.URL, opts ...HeaderOpts) (*http.Response, error) {
 }
 
 // Post method returns respons data from URL by POST method.
-func (c *client) Post(u *url.URL, payload io.Reader, opts ...HeaderOpts) (*http.Response, error) {
+func (c *client) Post(u *url.URL, payload io.Reader, opts ...HeaderOpts) (*Response, error) {
 	req, err := c.request(http.MethodPost, u, payload, opts...)
 	if err != nil {
 		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
@@ -94,16 +94,17 @@ func (c *client) request(method string, u *url.URL, payload io.Reader, opts ...H
 	return req, nil
 }
 
-func (c *client) fetch(request *http.Request) (*http.Response, error) {
+func (c *client) fetch(request *http.Request) (*Response, error) {
 	if c == nil {
 		c = New().(*client)
 	}
-	resp, err := c.client.Do(request)
+	r, err := c.client.Do(request)
 	if err != nil {
 		return nil, errs.Wrap(err)
 	}
+	resp := &Response{r}
 	if !(resp.StatusCode != 0 && resp.StatusCode < http.StatusBadRequest) {
-		resp.Body.Close()
+		resp.Close()
 		return nil, errs.Wrap(ErrHTTPStatus, errs.WithContext("status", resp.StatusCode))
 	}
 	return resp, nil

@@ -2,16 +2,33 @@ package fetch
 
 import (
 	"io"
+	"io/ioutil"
 	"net/http"
-	"net/url"
+
+	"github.com/spiegel-im-spiegel/errs"
 )
 
-type HeaderOpts func(*http.Request)
+//Response is wrapper class of http.Response.
+type Response struct {
+	*http.Response
+}
 
-// Client is inteface class for HTTP client.
-type Client interface {
-	Get(u *url.URL, opts ...HeaderOpts) (*Response, error)
-	Post(u *url.URL, payload io.Reader, opts ...HeaderOpts) (*Response, error)
+//Close method closes Response.Body safety.
+func (resp *Response) Close() {
+	if resp == nil || resp.Response == nil {
+		return
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	resp.Body.Close()
+}
+
+func (resp *Response) DumpBodyAndClose() ([]byte, error) {
+	if resp == nil || resp.Response == nil {
+		return nil, errs.Wrap(ErrNullPointer)
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	return b, errs.Wrap(err)
 }
 
 /* Copyright 2021 Spiegel

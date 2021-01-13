@@ -21,7 +21,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
-	defer resp.Body.Close()
+	defer resp.Close()
 	if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
