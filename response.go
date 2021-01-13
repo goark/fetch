@@ -13,6 +13,14 @@ type response struct {
 	*http.Response
 }
 
+//Request method returns Request element in http.Response.
+func (resp *response) Request() *http.Request {
+	if resp == nil || resp.Response == nil {
+		return nil
+	}
+	return resp.Response.Request
+}
+
 //Header method returns Header element in http.Response.
 func (resp *response) Header() http.Header {
 	if resp == nil || resp.Response == nil {
