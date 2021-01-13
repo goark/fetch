@@ -30,9 +30,11 @@ func TestGet(t *testing.T) {
 			fmt.Printf("Info: %+v\n", err)
 		} else {
 			resp, err := fetch.New(
-				fetch.WithContext(context.Background()),
 				fetch.WithHTTPClient(&http.Client{}),
-			).Get(u)
+			).Get(
+				u,
+				fetch.WithContext(context.Background()),
+			)
 			if err != nil {
 				if !errors.Is(err, tc.err2) {
 					t.Errorf("fetch.Client.Get() is \"%v\", want \"%+v\"", err, tc.err2)

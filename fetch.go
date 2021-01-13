@@ -6,7 +6,7 @@ import (
 	"net/url"
 )
 
-type RequestOpts func(*http.Request)
+type RequestOpts func(*http.Request) *http.Request
 
 // Client is inteface class for HTTP client.
 type Client interface {
