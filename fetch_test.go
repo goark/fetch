@@ -3,6 +3,7 @@ package fetch_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -26,19 +27,21 @@ func TestGet(t *testing.T) {
 			if !errors.Is(err, tc.err1) {
 				t.Errorf("fetch.Client.URL(%s) is \"%v\", want \"%+v\"", tc.s, err, tc.err1)
 			}
-			// fmt.Printf("Info: %+v\n", err)
+			fmt.Printf("Info: %+v\n", err)
 		} else {
 			resp, err := fetch.New(
-				fetch.WithContext(context.Background()),
 				fetch.WithHTTPClient(&http.Client{}),
-			).Get(u)
+			).Get(
+				u,
+				fetch.WithContext(context.Background()),
+			)
 			if err != nil {
 				if !errors.Is(err, tc.err2) {
 					t.Errorf("fetch.Client.Get() is \"%v\", want \"%+v\"", err, tc.err2)
 				}
-				// fmt.Printf("Info: %+v\n", err)
+				fmt.Printf("Info: %+v\n", err)
 			} else {
-				resp.Body.Close()
+				resp.Close()
 			}
 		}
 	}

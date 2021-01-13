@@ -1,112 +1,25 @@
 package fetch
 
 import (
-	"context"
 	"io"
 	"net/http"
 	"net/url"
-
-	"github.com/spiegel-im-spiegel/errs"
 )
 
-// client is client class for fetching (internal).
-type client struct {
-	ctx    context.Context
-	client *http.Client
+type RequestOpts func(*http.Request) *http.Request
+
+// Client is inteface class for HTTP client.
+type Client interface {
+	Get(u *url.URL, opts ...RequestOpts) (Response, error)
+	Post(u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error)
 }
 
-type ClientOpts func(*client)
-
-// New function returns Client instance.
-func New(opts ...ClientOpts) Client {
-	cli := &client{ctx: context.Background(), client: http.DefaultClient}
-	for _, opt := range opts {
-		opt(cli)
-	}
-	return cli
-}
-
-// WithProtocol returns function for setting context.Context.
-func WithContext(ctx context.Context) ClientOpts {
-	return func(c *client) {
-		c.ctx = ctx
-	}
-}
-
-// WithProtocol returns function for setting http.Client.
-func WithHTTPClient(cli *http.Client) ClientOpts {
-	return func(c *client) {
-		c.client = cli
-	}
-}
-
-// Get method returns respons data from URL by GET method.
-func (c *client) Get(u *url.URL, opts ...HeaderOpts) (*http.Response, error) {
-	req, err := c.request(http.MethodGet, u, nil, opts...)
-	if err != nil {
-		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
-	}
-	resp, err := c.fetch(req)
-	if err != nil {
-		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
-	}
-	return resp, nil
-}
-
-// Post method returns respons data from URL by POST method.
-func (c *client) Post(u *url.URL, payload io.Reader, opts ...HeaderOpts) (*http.Response, error) {
-	req, err := c.request(http.MethodPost, u, payload, opts...)
-	if err != nil {
-		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
-	}
-	resp, err := c.fetch(req)
-	if err != nil {
-		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
-	}
-	return resp, nil
-}
-
-// WithRequestHeaderAdd returns function for adding request header in http.Request.
-func WithRequestHeaderAdd(name, value string) HeaderOpts {
-	return func(req *http.Request) {
-		req.Header.Add(name, value)
-	}
-}
-
-// WithRequestHeaderSet returns function for setting request header in http.Request.
-func WithRequestHeaderSet(name, value string) HeaderOpts {
-	return func(req *http.Request) {
-		req.Header.Set(name, value)
-	}
-}
-
-func (c *client) request(method string, u *url.URL, payload io.Reader, opts ...HeaderOpts) (*http.Request, error) {
-	if c == nil {
-		c = New().(*client)
-	}
-	req, err := http.NewRequestWithContext(c.ctx, method, u.String(), payload)
-	if err != nil {
-		return nil, errs.Wrap(err)
-	}
-	for _, opt := range opts {
-		opt(req)
-	}
-	return req, nil
-}
-
-func (c *client) fetch(request *http.Request) (*http.Response, error) {
-	if c == nil {
-		c = New().(*client)
-	}
-	resp, err := c.client.Do(request)
-	if err != nil {
-		return nil, errs.Wrap(err)
-	}
-	if !(resp.StatusCode != 0 && resp.StatusCode < http.StatusBadRequest) {
-		resp.Body.Close()
-		return nil, errs.Wrap(ErrHTTPStatus, errs.WithContext("status", resp.StatusCode))
-	}
-	return resp, nil
+// Response is inteface class for HTTP response.
+type Response interface {
+	Header() http.Header
+	Body() io.ReadCloser
+	Close()
+	DumpBodyAndClose() ([]byte, error)
 }
 
 /* Copyright 2021 Spiegel

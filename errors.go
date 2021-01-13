@@ -3,6 +3,7 @@ package fetch
 import "errors"
 
 var (
+	ErrNullPointer    = errors.New("null reference instance")
 	ErrInvalidRequest = errors.New("invalid HTTP request")
 	ErrInvalidURL     = errors.New("invalid URL")
 	ErrHTTPStatus     = errors.New("bad HTTP status")
