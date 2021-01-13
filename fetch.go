@@ -16,6 +16,7 @@ type Client interface {
 
 // Response is inteface class for HTTP response.
 type Response interface {
+	Request() *http.Request
 	Header() http.Header
 	Body() io.ReadCloser
 	Close()
