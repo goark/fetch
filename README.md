@@ -17,10 +17,8 @@ import "github.com/spiegel-im-spiegel/fetch"
 package main
 
 import (
-    "context"
     "fmt"
     "io"
-    "net/http"
     "os"
 
     "github.com/spiegel-im-spiegel/fetch"
@@ -32,8 +30,7 @@ func main() {
         fmt.Fprintln(os.Stderr, err)
         return
     }
-    resp, err := fetch.New(fetch.WithHTTPClient(&http.Client{})).
-        Get(u, fetch.WithContext(context.Background()))
+    resp, err := fetch.New().Get(u)
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         return
