@@ -18,7 +18,7 @@ type ClientOpts func(*client)
 
 // New function returns Client instance.
 func New(opts ...ClientOpts) Client {
-	cli := &client{client: http.DefaultClient}
+	cli := &client{client: &http.Client{}}
 	for _, opt := range opts {
 		opt(cli)
 	}
