@@ -2,7 +2,6 @@ package fetch
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/spiegel-im-spiegel/errs"
@@ -42,7 +41,7 @@ func (resp *response) Close() {
 	if resp == nil || resp.Response == nil {
 		return
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body())
+	_, _ = io.Copy(io.Discard, resp.Body())
 	resp.Body().Close()
 }
 
@@ -51,7 +50,7 @@ func (resp *response) DumpBodyAndClose() ([]byte, error) {
 		return nil, errs.Wrap(ErrNullPointer)
 	}
 	defer resp.Body().Close()
-	b, err := ioutil.ReadAll(resp.Body())
+	b, err := io.ReadAll(resp.Body())
 	return b, errs.Wrap(err)
 }
 
