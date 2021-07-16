@@ -42,14 +42,16 @@ func (resp *response) Close() {
 		return
 	}
 	_, _ = io.Copy(io.Discard, resp.Body())
-	resp.Body().Close()
+	_ = resp.Body().Close()
 }
 
 func (resp *response) DumpBodyAndClose() ([]byte, error) {
 	if resp == nil || resp.Response == nil {
 		return nil, errs.Wrap(ErrNullPointer)
 	}
-	defer resp.Body().Close()
+	defer func() {
+		_ = resp.Body().Close()
+	}()
 	b, err := io.ReadAll(resp.Body())
 	return b, errs.Wrap(err)
 }
