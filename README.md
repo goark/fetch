@@ -1,16 +1,18 @@
 # [fetch] -- Fetch Data from URL
 
-[![check vulns](https://github.com/spiegel-im-spiegel/fetch/workflows/vulns/badge.svg)](https://github.com/spiegel-im-spiegel/fetch/actions)
-[![lint status](https://github.com/spiegel-im-spiegel/fetch/workflows/lint/badge.svg)](https://github.com/spiegel-im-spiegel/fetch/actions)
-[![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/spiegel-im-spiegel/fetch/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/release/spiegel-im-spiegel/fetch.svg)](https://github.com/spiegel-im-spiegel/fetch/releases/latest)
+[![check vulns](https://github.com/goark/fetch/workflows/vulns/badge.svg)](https://github.com/goark/fetch/actions)
+[![lint status](https://github.com/goark/fetch/workflows/lint/badge.svg)](https://github.com/goark/fetch/actions)
+[![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/goark/fetch/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/goark/fetch.svg)](https://github.com/goark/fetch/releases/latest)
 
 This package is required Go 1.16 or later.
+
+**Migrated repository to [github.com/goark/fetch][fetch]**
 
 ## Import
 
 ```go
-import "github.com/spiegel-im-spiegel/fetch"
+import "github.com/goark/fetch"
 ```
 
 ## Usage
@@ -23,7 +25,7 @@ import (
     "io"
     "os"
 
-    "github.com/spiegel-im-spiegel/fetch"
+    "github.com/goark/fetch"
 )
 
 func main() {
@@ -48,4 +50,4 @@ func main() {
 
 [![dependency.png](./dependency.png)](./dependency.png)
 
-[fetch]: https://github.com/spiegel-im-spiegel/fetch "spiegel-im-spiegel/fetch: Fetch Data from URL"
+[fetch]: https://github.com/goark/fetch "goark/fetch: Fetch Data from URL"

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spiegel-im-spiegel/fetch"
+	"github.com/goark/fetch"
 )
 
 func TestGet(t *testing.T) {

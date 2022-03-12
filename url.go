@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/errs"
 )
 
 // URL function returns url.URL instance from string.

@@ -1,3 +1,4 @@
+//go:build run
 // +build run
 
 package main
@@ -7,7 +8,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/spiegel-im-spiegel/fetch"
+	"github.com/goark/fetch"
 )
 
 func main() {

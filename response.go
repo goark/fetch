@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/errs"
 )
 
 //response is wrapper class of http.Response.
