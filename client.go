@@ -33,8 +33,14 @@ func WithHTTPClient(cli *http.Client) ClientOpts {
 }
 
 // Get method returns respons data from URL by GET method.
+// Deprecated: Should use GetWithContext() method instead of Get() method.
 func (c *client) Get(u *url.URL, opts ...RequestOpts) (Response, error) {
-	req, err := request(http.MethodGet, u, nil, opts...)
+	return c.GetWithContext(context.Background(), u, opts...)
+}
+
+// GetWithContext method returns respons data from URL by GET method with context.Context.
+func (c *client) GetWithContext(ctx context.Context, u *url.URL, opts ...RequestOpts) (Response, error) {
+	req, err := request(ctx, http.MethodGet, u, nil, opts...)
 	if err != nil {
 		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
 	}
@@ -46,8 +52,14 @@ func (c *client) Get(u *url.URL, opts ...RequestOpts) (Response, error) {
 }
 
 // Post method returns respons data from URL by POST method.
+// Deprecated: Should use PostWithContext() method instead of Post() method.
 func (c *client) Post(u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error) {
-	req, err := request(http.MethodPost, u, payload, opts...)
+	return c.PostWithContext(context.Background(), u, payload, opts...)
+}
+
+// PostWithContext method returns respons data from URL by POST method with context.Context.
+func (c *client) PostWithContext(ctx context.Context, u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error) {
+	req, err := request(ctx, http.MethodPost, u, payload, opts...)
 	if err != nil {
 		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
 	}
@@ -59,6 +71,7 @@ func (c *client) Post(u *url.URL, payload io.Reader, opts ...RequestOpts) (Respo
 }
 
 // WithProtocol returns function for setting context.Context.
+// Deprecated: should not be used
 func WithContext(ctx context.Context) RequestOpts {
 	return func(req *http.Request) *http.Request {
 		if ctx != nil {
@@ -84,8 +97,8 @@ func WithRequestHeaderSet(name, value string) RequestOpts {
 	}
 }
 
-func request(method string, u *url.URL, payload io.Reader, opts ...RequestOpts) (*http.Request, error) {
-	req, err := http.NewRequest(method, u.String(), payload)
+func request(ctx context.Context, method string, u *url.URL, payload io.Reader, opts ...RequestOpts) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), payload)
 	if err != nil {
 		return nil, errs.Wrap(err)
 	}
@@ -111,7 +124,7 @@ func (c *client) fetch(request *http.Request) (Response, error) {
 	return resp, nil
 }
 
-/* Copyright 2021 Spiegel
+/* Copyright 2023 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

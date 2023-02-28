@@ -21,6 +21,7 @@ import "github.com/goark/fetch"
 package main
 
 import (
+    "context"
     "fmt"
     "io"
     "os"
@@ -34,7 +35,7 @@ func main() {
         fmt.Fprintln(os.Stderr, err)
         return
     }
-    resp, err := fetch.New().Get(u)
+    resp, err := fetch.New().GetWithContext(context.Background(), u)
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         return
