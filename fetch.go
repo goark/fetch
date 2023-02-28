@@ -1,6 +1,7 @@
 package fetch
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/url"
@@ -10,8 +11,12 @@ type RequestOpts func(*http.Request) *http.Request
 
 // Client is inteface class for HTTP client.
 type Client interface {
+	// Deprecated: Should use GetWithContext() method instead of Get() method.
 	Get(u *url.URL, opts ...RequestOpts) (Response, error)
+	GetWithContext(ctx context.Context, u *url.URL, opts ...RequestOpts) (Response, error)
+	// Deprecated: Should use PostWithContext() method instead of Post() method.
 	Post(u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error)
+	PostWithContext(ctx context.Context, u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error)
 }
 
 // Response is inteface class for HTTP response.
@@ -23,7 +28,7 @@ type Response interface {
 	DumpBodyAndClose() ([]byte, error)
 }
 
-/* Copyright 2021 Spiegel
+/* Copyright 2023 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

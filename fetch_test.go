@@ -31,10 +31,7 @@ func TestGet(t *testing.T) {
 		} else {
 			resp, err := fetch.New(
 				fetch.WithHTTPClient(&http.Client{}),
-			).Get(
-				u,
-				fetch.WithContext(context.Background()),
-			)
+			).GetWithContext(context.Background(), u)
 			if err != nil {
 				if !errors.Is(err, tc.err2) {
 					t.Errorf("fetch.Client.Get() is \"%v\", want \"%+v\"", err, tc.err2)
@@ -47,7 +44,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-/* Copyright 2021 Spiegel
+/* Copyright 2023 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
