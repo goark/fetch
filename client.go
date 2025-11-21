@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/goark/errs"
 )
@@ -118,14 +119,17 @@ func (c *client) fetch(request *http.Request) (Response, error) {
 		return nil, errs.Wrap(err)
 	}
 	resp := &response{r}
-	if !(resp.StatusCode != 0 && resp.StatusCode < http.StatusBadRequest) {
-		resp.Close()
-		return nil, errs.Wrap(fmt.Errorf("%w: status %d", ErrHTTPStatus, resp.StatusCode), errs.WithContext("status", resp.StatusCode))
+	if resp.StatusCode == 0 || resp.StatusCode >= http.StatusBadRequest {
+		err := ErrHTTPStatus
+		if cerr := resp.Close(); cerr != nil && !errs.Is(err, os.ErrClosed) {
+			err = errs.Join(cerr, err)
+		}
+		return nil, errs.Wrap(fmt.Errorf("%w: status %d", err, resp.StatusCode), errs.WithContext("status", resp.StatusCode))
 	}
 	return resp, nil
 }
 
-/* Copyright 2021-2023 Spiegel
+/* Copyright 2021-2025 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -24,11 +24,11 @@ type Response interface {
 	Request() *http.Request
 	Header() http.Header
 	Body() io.ReadCloser
-	Close()
+	Close() error
 	DumpBodyAndClose() ([]byte, error)
 }
 
-/* Copyright 2023 Spiegel
+/* Copyright 2023-2025 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
