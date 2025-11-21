@@ -1,7 +1,5 @@
 module github.com/goark/fetch
 
-go 1.23
-
-toolchain go1.23.5
+go 1.25
 
 require github.com/goark/errs v1.3.2
