@@ -37,14 +37,14 @@ func TestGet(t *testing.T) {
 					t.Errorf("fetch.Client.Get() is \"%v\", want \"%+v\"", err, tc.err2)
 				}
 				fmt.Printf("Info: %+v\n", err)
-			} else {
-				resp.Close()
+			} else if cerr := resp.Close(); cerr != nil {
+				t.Errorf("resp.Close() is \"%v\", want nil", cerr)
 			}
 		}
 	}
 }
 
-/* Copyright 2023 Spiegel
+/* Copyright 2023-2025 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

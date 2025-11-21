@@ -3,16 +3,17 @@ package fetch
 import (
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/goark/errs"
 )
 
-//response is wrapper class of http.Response.
+// response is wrapper class of http.Response.
 type response struct {
 	*http.Response
 }
 
-//Request method returns Request element in http.Response.
+// Request method returns Request element in http.Response.
 func (resp *response) Request() *http.Request {
 	if resp == nil || resp.Response == nil {
 		return nil
@@ -20,7 +21,7 @@ func (resp *response) Request() *http.Request {
 	return resp.Response.Request
 }
 
-//Header method returns Header element in http.Response.
+// Header method returns Header element in http.Response.
 func (resp *response) Header() http.Header {
 	if resp == nil || resp.Response == nil {
 		return nil
@@ -28,7 +29,7 @@ func (resp *response) Header() http.Header {
 	return resp.Response.Header
 }
 
-//Header method returns Body element in http.Response.
+// Header method returns Body element in http.Response.
 func (resp *response) Body() io.ReadCloser {
 	if resp == nil || resp.Response == nil {
 		return nil
@@ -36,27 +37,43 @@ func (resp *response) Body() io.ReadCloser {
 	return resp.Response.Body
 }
 
-//Close method closes Response.Body safety.
-func (resp *response) Close() {
+// Close method closes Response.Body safety.
+func (resp *response) Close() (err error) {
 	if resp == nil || resp.Response == nil {
-		return
-	}
-	_, _ = io.Copy(io.Discard, resp.Body())
-	_ = resp.Body().Close()
-}
-
-func (resp *response) DumpBodyAndClose() ([]byte, error) {
-	if resp == nil || resp.Response == nil {
-		return nil, errs.Wrap(ErrNullPointer)
+		return nil
 	}
 	defer func() {
-		_ = resp.Body().Close()
+		if resp == nil {
+			return
+		}
+		if cerr := resp.Body().Close(); cerr != nil {
+			err = errs.Join(cerr, err)
+		}
 	}()
-	b, err := io.ReadAll(resp.Body())
-	return b, errs.Wrap(err)
+	_, err = io.Copy(io.Discard, resp.Body())
+	err = errs.Wrap(err)
+	return
 }
 
-/* Copyright 2021 Spiegel
+func (resp *response) DumpBodyAndClose() (b []byte, err error) {
+	if resp == nil || resp.Response == nil {
+		err = errs.Wrap(ErrNullPointer)
+		return
+	}
+	defer func() {
+		if resp == nil {
+			return
+		}
+		if cerr := resp.Body().Close(); cerr != nil && !errs.Is(err, os.ErrClosed) {
+			err = errs.Join(cerr, err)
+		}
+	}()
+	b, err = io.ReadAll(resp.Body())
+	err = errs.Wrap(err)
+	return
+}
+
+/* Copyright 2021-2025 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
