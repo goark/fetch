@@ -5,7 +5,7 @@
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/goark/fetch/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/goark/fetch.svg)](https://github.com/goark/fetch/releases/latest)
 
-This package is required Go 1.16 or later.
+This package is required Go 1.25 or later.
 
 **Migrated repository to [github.com/goark/fetch][fetch]**
 
