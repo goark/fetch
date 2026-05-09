@@ -2,6 +2,7 @@ package fetch
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,6 +31,10 @@ func New(opts ...ClientOpts) Client {
 // WithProtocol returns function for setting http.Client.
 func WithHTTPClient(cli *http.Client) ClientOpts {
 	return func(c *client) {
+		if cli == nil {
+			c.client = &http.Client{}
+			return
+		}
 		c.client = cli
 	}
 }
@@ -44,11 +49,14 @@ func (c *client) Get(u *url.URL, opts ...RequestOpts) (Response, error) {
 func (c *client) GetWithContext(ctx context.Context, u *url.URL, opts ...RequestOpts) (Response, error) {
 	req, err := request(ctx, http.MethodGet, u, nil, opts...)
 	if err != nil {
-		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
+		if errors.Is(err, ErrInvalidURL) {
+			return nil, errs.Wrap(ErrInvalidURL, errs.WithCause(err), errs.WithContext("url", urlText(u)))
+		}
+		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", urlText(u)))
 	}
 	resp, err := c.fetch(req)
 	if err != nil {
-		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
+		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", urlText(u)))
 	}
 	return resp, nil
 }
@@ -63,11 +71,14 @@ func (c *client) Post(u *url.URL, payload io.Reader, opts ...RequestOpts) (Respo
 func (c *client) PostWithContext(ctx context.Context, u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error) {
 	req, err := request(ctx, http.MethodPost, u, payload, opts...)
 	if err != nil {
-		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
+		if errors.Is(err, ErrInvalidURL) {
+			return nil, errs.Wrap(ErrInvalidURL, errs.WithCause(err), errs.WithContext("url", urlText(u)))
+		}
+		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", urlText(u)))
 	}
 	resp, err := c.fetch(req)
 	if err != nil {
-		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", u.String()))
+		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", urlText(u)))
 	}
 	return resp, nil
 }
@@ -100,6 +111,9 @@ func WithRequestHeaderSet(name, value string) RequestOpts {
 }
 
 func request(ctx context.Context, method string, u *url.URL, payload io.Reader, opts ...RequestOpts) (*http.Request, error) {
+	if u == nil {
+		return nil, errs.Wrap(ErrInvalidURL)
+	}
 	req, err := http.NewRequestWithContext(ctx, method, u.String(), payload)
 	if err != nil {
 		return nil, errs.Wrap(err)
@@ -114,6 +128,9 @@ func (c *client) fetch(request *http.Request) (Response, error) {
 	if c == nil {
 		c = New().(*client)
 	}
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
 	r, err := c.client.Do(request)
 	if err != nil {
 		return nil, errs.Wrap(err)
@@ -121,12 +138,19 @@ func (c *client) fetch(request *http.Request) (Response, error) {
 	resp := &response{r}
 	if resp.StatusCode == 0 || resp.StatusCode >= http.StatusBadRequest {
 		err := ErrHTTPStatus
-		if cerr := resp.Close(); cerr != nil && !errs.Is(err, os.ErrClosed) {
+		if cerr := resp.Close(); cerr != nil && !errs.Is(cerr, os.ErrClosed) {
 			err = errs.Join(cerr, err)
 		}
 		return nil, errs.Wrap(fmt.Errorf("%w: status %d", err, resp.StatusCode), errs.WithContext("status", resp.StatusCode))
 	}
 	return resp, nil
+}
+
+func urlText(u *url.URL) string {
+	if u == nil {
+		return ""
+	}
+	return u.String()
 }
 
 /* Copyright 2021-2025 Spiegel

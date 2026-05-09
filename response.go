@@ -64,7 +64,7 @@ func (resp *response) DumpBodyAndClose() (b []byte, err error) {
 		if resp == nil {
 			return
 		}
-		if cerr := resp.Body().Close(); cerr != nil && !errs.Is(err, os.ErrClosed) {
+		if cerr := resp.Body().Close(); cerr != nil && !errs.Is(cerr, os.ErrClosed) {
 			err = errs.Join(cerr, err)
 		}
 	}()

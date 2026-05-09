@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/goark/fetch"
@@ -41,6 +43,43 @@ func TestGet(t *testing.T) {
 				t.Errorf("resp.Close() is \"%v\", want nil", cerr)
 			}
 		}
+	}
+}
+
+func TestGetWithNilURL(t *testing.T) {
+	resp, err := fetch.New().GetWithContext(context.Background(), nil)
+	if err == nil {
+		t.Fatal("error is nil, want ErrInvalidURL")
+	}
+	if !errors.Is(err, fetch.ErrInvalidURL) {
+		t.Fatalf("GetWithContext(nil) is %v, want ErrInvalidURL", err)
+	}
+	if resp != nil {
+		t.Fatal("response is not nil, want nil")
+	}
+}
+
+func TestWithHTTPClientNilFallback(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = io.WriteString(w, "ok")
+	}))
+	defer ts.Close()
+
+	u, err := fetch.URL(ts.URL)
+	if err != nil {
+		t.Fatalf("fetch.URL() error = %v", err)
+	}
+
+	resp, err := fetch.New(fetch.WithHTTPClient(nil)).GetWithContext(context.Background(), u)
+	if err != nil {
+		t.Fatalf("GetWithContext() error = %v", err)
+	}
+	if resp == nil {
+		t.Fatal("response is nil")
+	}
+	if cerr := resp.Close(); cerr != nil {
+		t.Fatalf("resp.Close() error = %v", cerr)
 	}
 }
 
