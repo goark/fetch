@@ -7,7 +7,9 @@ import (
 	"github.com/goark/errs"
 )
 
-// URL function returns url.URL instance from string.
+// URL parses rawURL and returns *url.URL.
+//
+// Leading and trailing whitespaces are trimmed before parsing.
 func URL(rawURL string) (*url.URL, error) {
 	u, err := url.Parse(strings.TrimSpace(rawURL))
 	if err != nil {
@@ -16,7 +18,7 @@ func URL(rawURL string) (*url.URL, error) {
 	return u, nil
 }
 
-/* Copyright 2021 Spiegel
+/* Copyright 2021-2026 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

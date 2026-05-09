@@ -8,7 +8,7 @@ import (
 	"github.com/goark/errs"
 )
 
-// response is wrapper class of http.Response.
+// response wraps http.Response.
 type response struct {
 	*http.Response
 }
@@ -29,7 +29,7 @@ func (resp *response) Header() http.Header {
 	return resp.Response.Header
 }
 
-// Header method returns Body element in http.Response.
+// Body method returns Body element in http.Response.
 func (resp *response) Body() io.ReadCloser {
 	if resp == nil || resp.Response == nil {
 		return nil
@@ -37,7 +37,7 @@ func (resp *response) Body() io.ReadCloser {
 	return resp.Response.Body
 }
 
-// Close method closes Response.Body safety.
+// Close method safely drains and closes Response.Body.
 func (resp *response) Close() (err error) {
 	if resp == nil || resp.Response == nil {
 		return nil
@@ -56,6 +56,7 @@ func (resp *response) Close() (err error) {
 	return
 }
 
+// DumpBodyAndClose reads all response body bytes and closes Response.Body.
 func (resp *response) DumpBodyAndClose() (b []byte, err error) {
 	if resp == nil || resp.Response == nil {
 		err = errs.Wrap(ErrNullPointer)

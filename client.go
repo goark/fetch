@@ -17,9 +17,10 @@ type client struct {
 	client *http.Client
 }
 
+// ClientOpts configures a Client.
 type ClientOpts func(*client)
 
-// New function returns Client instance.
+// New creates a new Client.
 func New(opts ...ClientOpts) Client {
 	cli := &client{client: &http.Client{}}
 	for _, opt := range opts {
@@ -28,7 +29,9 @@ func New(opts ...ClientOpts) Client {
 	return cli
 }
 
-// WithProtocol returns function for setting http.Client.
+// WithHTTPClient sets the HTTP client used by fetch.
+//
+// If cli is nil, it falls back to a default *http.Client.
 func WithHTTPClient(cli *http.Client) ClientOpts {
 	return func(c *client) {
 		if cli == nil {
@@ -39,13 +42,13 @@ func WithHTTPClient(cli *http.Client) ClientOpts {
 	}
 }
 
-// Get method returns respons data from URL by GET method.
-// Deprecated: Should use GetWithContext() method instead of Get() method.
+// Get fetches data from URL with HTTP GET.
+// Deprecated: Use GetWithContext instead.
 func (c *client) Get(u *url.URL, opts ...RequestOpts) (Response, error) {
 	return c.GetWithContext(context.Background(), u, opts...)
 }
 
-// GetWithContext method returns respons data from URL by GET method with context.Context.
+// GetWithContext fetches data from URL with HTTP GET and context.
 func (c *client) GetWithContext(ctx context.Context, u *url.URL, opts ...RequestOpts) (Response, error) {
 	req, err := request(ctx, http.MethodGet, u, nil, opts...)
 	if err != nil {
@@ -61,13 +64,13 @@ func (c *client) GetWithContext(ctx context.Context, u *url.URL, opts ...Request
 	return resp, nil
 }
 
-// Post method returns respons data from URL by POST method.
-// Deprecated: Should use PostWithContext() method instead of Post() method.
+// Post fetches data from URL with HTTP POST.
+// Deprecated: Use PostWithContext instead.
 func (c *client) Post(u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error) {
 	return c.PostWithContext(context.Background(), u, payload, opts...)
 }
 
-// PostWithContext method returns respons data from URL by POST method with context.Context.
+// PostWithContext fetches data from URL with HTTP POST and context.
 func (c *client) PostWithContext(ctx context.Context, u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error) {
 	req, err := request(ctx, http.MethodPost, u, payload, opts...)
 	if err != nil {
@@ -83,8 +86,8 @@ func (c *client) PostWithContext(ctx context.Context, u *url.URL, payload io.Rea
 	return resp, nil
 }
 
-// WithProtocol returns function for setting context.Context.
-// Deprecated: should not be used
+// WithContext sets request context on an option-applied request.
+// Deprecated: Use GetWithContext and PostWithContext instead.
 func WithContext(ctx context.Context) RequestOpts {
 	return func(req *http.Request) *http.Request {
 		if ctx != nil {
@@ -110,6 +113,7 @@ func WithRequestHeaderSet(name, value string) RequestOpts {
 	}
 }
 
+// request creates an HTTP request and applies request options.
 func request(ctx context.Context, method string, u *url.URL, payload io.Reader, opts ...RequestOpts) (*http.Request, error) {
 	if u == nil {
 		return nil, errs.Wrap(ErrInvalidURL)
@@ -124,6 +128,7 @@ func request(ctx context.Context, method string, u *url.URL, payload io.Reader, 
 	return req, nil
 }
 
+// fetch sends the request and validates response status.
 func (c *client) fetch(request *http.Request) (Response, error) {
 	if c == nil {
 		c = New().(*client)
@@ -146,6 +151,7 @@ func (c *client) fetch(request *http.Request) (Response, error) {
 	return resp, nil
 }
 
+// urlText returns a string form of URL, or an empty string for nil URL.
 func urlText(u *url.URL) string {
 	if u == nil {
 		return ""
