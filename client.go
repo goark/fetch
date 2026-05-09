@@ -50,7 +50,7 @@ func (c *client) GetWithContext(ctx context.Context, u *url.URL, opts ...Request
 	req, err := request(ctx, http.MethodGet, u, nil, opts...)
 	if err != nil {
 		if errors.Is(err, ErrInvalidURL) {
-			return nil, errs.Wrap(ErrInvalidURL, errs.WithCause(err), errs.WithContext("url", urlText(u)))
+			return nil, errs.Wrap(err, errs.WithContext("url", urlText(u)))
 		}
 		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", urlText(u)))
 	}
@@ -72,7 +72,7 @@ func (c *client) PostWithContext(ctx context.Context, u *url.URL, payload io.Rea
 	req, err := request(ctx, http.MethodPost, u, payload, opts...)
 	if err != nil {
 		if errors.Is(err, ErrInvalidURL) {
-			return nil, errs.Wrap(ErrInvalidURL, errs.WithCause(err), errs.WithContext("url", urlText(u)))
+			return nil, errs.Wrap(err, errs.WithContext("url", urlText(u)))
 		}
 		return nil, errs.Wrap(ErrInvalidRequest, errs.WithCause(err), errs.WithContext("url", urlText(u)))
 	}
