@@ -153,7 +153,7 @@ func urlText(u *url.URL) string {
 	return u.String()
 }
 
-/* Copyright 2021-2025 Spiegel
+/* Copyright 2021-2026 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
