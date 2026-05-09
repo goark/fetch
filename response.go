@@ -42,15 +42,16 @@ func (resp *response) Close() (err error) {
 	if resp == nil || resp.Response == nil {
 		return nil
 	}
+	body := resp.Body()
 	defer func() {
-		if resp == nil {
+		if body == nil {
 			return
 		}
-		if cerr := resp.Body().Close(); cerr != nil {
+		if cerr := body.Close(); cerr != nil && !errs.Is(cerr, os.ErrClosed) {
 			err = errs.Join(cerr, err)
 		}
 	}()
-	_, err = io.Copy(io.Discard, resp.Body())
+	_, err = io.Copy(io.Discard, body) // drain body to reuse connection
 	err = errs.Wrap(err)
 	return
 }
@@ -60,15 +61,16 @@ func (resp *response) DumpBodyAndClose() (b []byte, err error) {
 		err = errs.Wrap(ErrNullPointer)
 		return
 	}
+	body := resp.Body()
 	defer func() {
-		if resp == nil {
+		if body == nil {
 			return
 		}
-		if cerr := resp.Body().Close(); cerr != nil && !errs.Is(cerr, os.ErrClosed) {
+		if cerr := body.Close(); cerr != nil && !errs.Is(cerr, os.ErrClosed) {
 			err = errs.Join(cerr, err)
 		}
 	}()
-	b, err = io.ReadAll(resp.Body())
+	b, err = io.ReadAll(body)
 	err = errs.Wrap(err)
 	return
 }
