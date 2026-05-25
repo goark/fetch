@@ -16,11 +16,13 @@ type RequestOpts func(*http.Request) *http.Request
 // Client represents a fetch client.
 type Client interface {
 	// Get sends a GET request.
+	//
 	// Deprecated: Use GetWithContext instead.
 	Get(u *url.URL, opts ...RequestOpts) (Response, error)
 	// GetWithContext sends a GET request with context.
 	GetWithContext(ctx context.Context, u *url.URL, opts ...RequestOpts) (Response, error)
 	// Post sends a POST request.
+	//
 	// Deprecated: Use PostWithContext instead.
 	Post(u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error)
 	// PostWithContext sends a POST request with context.
