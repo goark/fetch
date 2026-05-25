@@ -1,7 +1,8 @@
-# [fetch] -- Fetch Data from URL
+# Fetch Data from URL
 
 [![ci status](https://github.com/goark/fetch/workflows/ci/badge.svg)](https://github.com/goark/fetch/actions)
 [![codeql status](https://github.com/goark/fetch/workflows/CodeQL/badge.svg)](https://github.com/goark/fetch/actions)
+[![Go Reference](https://pkg.go.dev/badge/github.com/goark/fetch.svg)](https://pkg.go.dev/github.com/goark/fetch)
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/goark/fetch/main/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/goark/fetch.svg)](https://github.com/goark/fetch/releases/latest)
 

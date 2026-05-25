@@ -43,6 +43,7 @@ func WithHTTPClient(cli *http.Client) ClientOpts {
 }
 
 // Get fetches data from URL with HTTP GET.
+//
 // Deprecated: Use GetWithContext instead.
 func (c *client) Get(u *url.URL, opts ...RequestOpts) (Response, error) {
 	return c.GetWithContext(context.Background(), u, opts...)
@@ -65,6 +66,7 @@ func (c *client) GetWithContext(ctx context.Context, u *url.URL, opts ...Request
 }
 
 // Post fetches data from URL with HTTP POST.
+//
 // Deprecated: Use PostWithContext instead.
 func (c *client) Post(u *url.URL, payload io.Reader, opts ...RequestOpts) (Response, error) {
 	return c.PostWithContext(context.Background(), u, payload, opts...)
@@ -87,6 +89,7 @@ func (c *client) PostWithContext(ctx context.Context, u *url.URL, payload io.Rea
 }
 
 // WithContext sets request context on an option-applied request.
+//
 // Deprecated: Use GetWithContext and PostWithContext instead.
 func WithContext(ctx context.Context) RequestOpts {
 	return func(req *http.Request) *http.Request {
