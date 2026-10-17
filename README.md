@@ -20,7 +20,7 @@ It wraps common `net/http` idioms so callers can handle download flows with less
 
 ### Requirements
 
-- Go 1.25 or later
+- Go 1.26 or later
 - [Task](https://taskfile.dev/) command (local tool for this repository)
 
 ### Local validation
