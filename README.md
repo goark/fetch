@@ -117,6 +117,7 @@ defer resp.Close()
 - `Client.GetWithContext(ctx, u, opts...)` performs GET request.
 - `Client.PostWithContext(ctx, u, payload, opts...)` performs POST request.
 - `fetch.WithHTTPClient(cli)` injects custom `*http.Client`.
+- `fetch.WithHTTP11Client()` creates an internal `*http.Client` configured for HTTP/1.1 only.
 - `fetch.WithRequestHeaderAdd(name, value)` and `fetch.WithRequestHeaderSet(name, value)` apply request headers.
 
 ### Error handling

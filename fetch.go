@@ -35,6 +35,8 @@ type Response interface {
 	Request() *http.Request
 	// Header returns response headers.
 	Header() http.Header
+	// Proto returns the HTTP protocol version.
+	Proto() string
 	// Body returns the response body reader.
 	Body() io.ReadCloser
 	// Close drains and closes the response body.

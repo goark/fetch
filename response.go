@@ -29,6 +29,14 @@ func (resp *response) Header() http.Header {
 	return resp.Response.Header
 }
 
+// Proto method returns Proto element in http.Response.
+func (resp *response) Proto() string {
+	if resp == nil || resp.Response == nil {
+		return ""
+	}
+	return resp.Response.Proto
+}
+
 // Body method returns Body element in http.Response.
 func (resp *response) Body() io.ReadCloser {
 	if resp == nil || resp.Response == nil {
