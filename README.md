@@ -20,7 +20,7 @@ It wraps common `net/http` idioms so callers can handle download flows with less
 
 ### Requirements
 
-- Go 1.25 or later
+- Go 1.26 or later
 - [Task](https://taskfile.dev/) command (local tool for this repository)
 
 ### Local validation
@@ -117,6 +117,7 @@ defer resp.Close()
 - `Client.GetWithContext(ctx, u, opts...)` performs GET request.
 - `Client.PostWithContext(ctx, u, payload, opts...)` performs POST request.
 - `fetch.WithHTTPClient(cli)` injects custom `*http.Client`.
+- `fetch.WithHTTP11Client()` creates an internal `*http.Client` configured for HTTP/1.1 only.
 - `fetch.WithRequestHeaderAdd(name, value)` and `fetch.WithRequestHeaderSet(name, value)` apply request headers.
 
 ### Error handling

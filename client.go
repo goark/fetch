@@ -2,12 +2,15 @@ package fetch
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/goark/errs"
 )
@@ -39,6 +42,25 @@ func WithHTTPClient(cli *http.Client) ClientOpts {
 			return
 		}
 		c.client = cli
+	}
+}
+
+// WithHTTP11Client configures fetch to use an HTTP client that prefers HTTP/1.1 only.
+//
+// This is useful for endpoints where HTTP/2 requests are rate-limited or rejected.
+func WithHTTP11Client() ClientOpts {
+	return func(c *client) {
+		tr := &http.Transport{
+			Proxy:                 http.ProxyFromEnvironment,
+			DialContext:           (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
+			ForceAttemptHTTP2:     false,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			TLSNextProto:          map[string]func(string, *tls.Conn) http.RoundTripper{},
+		}
+		c.client = &http.Client{Transport: tr}
 	}
 }
 
@@ -149,7 +171,11 @@ func (c *client) fetch(request *http.Request) (Response, error) {
 		if cerr := resp.Close(); cerr != nil && !errs.Is(cerr, os.ErrClosed) {
 			err = errs.Join(cerr, err)
 		}
-		return nil, errs.Wrap(fmt.Errorf("%w: status %d", err, resp.StatusCode), errs.WithContext("status", resp.StatusCode))
+		return nil, errs.Wrap(
+			fmt.Errorf("%w: status %d", err, resp.StatusCode),
+			errs.WithContext("status", resp.StatusCode),
+			errs.WithContext("protocol", resp.Proto()),
+		)
 	}
 	return resp, nil
 }
